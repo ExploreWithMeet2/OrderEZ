@@ -241,45 +241,40 @@ async def test_apply_price():
 
 
 async def main():
-    """Run all tests"""
-    print("\n")
-    print("╔═══════════════════════════════════════════════════════════════════╗")
-    print("║        DYNAMIC PRICING SYSTEM - COMPLETE TEST SUITE              ║")
-    print("╚═══════════════════════════════════════════════════════════════════╝")
-    
+
     try:
         # Test 1: Health check
         healthy = await test_health()
         if not healthy:
-            print("\n❌ API is not healthy. Please start the server first.")
+            print("\n API is not healthy. Please start the server first.")
             return
         
         # Test 2: Get branches
         branches = await test_get_branches()
         if not branches:
-            print("\n❌ No branches found. Please seed the database first.")
+            print("\n No branches found. Please seed the database first.")
             return
         
         # Test 3: Get model info (might not exist yet)
         model = await test_get_model_info()
         
         if not model:
-            print("\n⚠️  No model found. Training new model...")
+            print("\n No model found. Training new model...")
             # Test 4: Train model
             trained = await test_train_model()
             if not trained:
-                print("\n❌ Training failed. Please check the logs.")
+                print("\n Training failed. Please check the logs.")
                 return
             
             # Get model info again
             await test_get_model_info()
         else:
-            print("\n✅ Model already exists. Skipping training.")
+            print("\n Model already exists. Skipping training.")
         
         # Test 5: Generate predictions
         predictions = await test_predict_prices()
         if not predictions:
-            print("\n❌ Prediction failed. Please check the logs.")
+            print("\n Prediction failed. Please check the logs.")
             return
         
         # Test 6: Get stored predictions
@@ -287,19 +282,10 @@ async def main():
         
         # Test 7: Apply price (optional)
         await test_apply_price()
-        
-        print("\n" + "="*70)
-        print("✅ ALL TESTS COMPLETED SUCCESSFULLY!")
-        print("="*70)
-        print("\nNext Steps:")
-        print("1. View predictions in your database")
-        print("2. Check owner alerts for low-demand items")
-        print("3. Apply suggested prices for high-demand items")
-        print("4. Monitor revenue impact")
-        print("5. Retrain model monthly for best results")
+
         
     except Exception as e:
-        print(f"\n❌ Error: {str(e)}")
+        print(f"\n Error: {str(e)}")
         import traceback
         traceback.print_exc()
 

@@ -4,27 +4,25 @@ from fastapi.responses import JSONResponse
 
 # Import routers
 from routes import dp_routes
+from routes import recommendation_routes  
 
-# Create FastAPI app
 app = FastAPI(
     title="OrderEZ ML API",
     description="Machine Learning backend for OrderEZ - Dynamic Pricing & Recommendations",
-    version="1.0.0"
+    version="2.0.0"
 )
 
-# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure this for production
+    allow_origins=["*"],  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Include routers
 app.include_router(dp_routes.router)
+app.include_router(recommendation_routes.router)  
 
-# Root endpoint
 @app.get("/")
 async def root():
     return JSONResponse(
@@ -32,7 +30,7 @@ async def root():
         content={
             "message": "OrderEZ - ML Backend API",
             "status": "running",
-            "version": "1.0.0",
+            "version": "2.0.0",
             "endpoints": {
                 "dynamic_pricing": {
                     "train": {
@@ -70,12 +68,38 @@ async def root():
                         "url": "/dp/health",
                         "description": "Health check"
                     }
+                },
+                "recommendations": {
+                    "cart_based": {
+                        "method": "POST",
+                        "url": "/recommendation/cart-based",
+                        "description": "Get recommendations based on cart items"
+                    },
+                    "personalized": {
+                        "method": "POST",
+                        "url": "/recommendation/personalized",
+                        "description": "Get personalized recommendations for user"
+                    },
+                    "user_history": {
+                        "method": "GET",
+                        "url": "/recommendation/user-history/{branch_id}",
+                        "description": "Get user order history"
+                    },
+                    "popular": {
+                        "method": "GET",
+                        "url": "/recommendation/popular/{branch_id}",
+                        "description": "Get popular items"
+                    },
+                    "health": {
+                        "method": "GET",
+                        "url": "/recommendation/health",
+                        "description": "Health check"
+                    }
                 }
             }
         },
     )
 
-# Health check
 @app.get("/health")
 async def health_check():
     return JSONResponse(
@@ -83,7 +107,11 @@ async def health_check():
         content={
             "status": "healthy",
             "service": "OrderEZ ML API",
-            "version": "1.0.0"
+            "version": "2.0.0",
+            "features": [
+                "dynamic_pricing",
+                "recommendations"
+            ]
         }
     )
 
@@ -93,6 +121,11 @@ if __name__ == "__main__":
     print("\n" + "="*70)
     print("🚀 Starting OrderEZ ML API Server")
     print("="*70)
+    print("📊 Features:")
+    print("  - Dynamic Pricing (LSTM-based)")
+    print("  - Cart-based Recommendations")
+    print("  - Personalized Recommendations")
+    print("="*70 + "\n")
     
     uvicorn.run(
         "app:app",

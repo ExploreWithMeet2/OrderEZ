@@ -54,7 +54,7 @@ async def train_model_route(request: TrainRequest):
         )
     
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=200, detail=str(e))
 
 
 @router.post("/predict")
