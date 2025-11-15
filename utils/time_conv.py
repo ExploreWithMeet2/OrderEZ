@@ -2,9 +2,6 @@ from datetime import datetime
 
 
 def extract_time_features(ms_timestamp: int):
-    """
-    Convert milliseconds timestamp into multiple useful time features.
-    """
     dt = datetime.fromtimestamp(ms_timestamp / 1000)
 
     features = {

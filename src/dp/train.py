@@ -34,7 +34,6 @@ MIN_CONFIDENCE = 0.6
 
 b_a = Config.b_a
 def build_model(input_shape: Tuple[int, int]) -> Sequential:
-    """Build LSTM model for price prediction"""
     
     model = Sequential([
         LSTM(128, return_sequences=True, input_shape=input_shape),
@@ -74,8 +73,6 @@ def prepare_training_data(
     processed_data: pd.DataFrame,
     branch_id: str
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    """Prepare and split data for training"""
-    
     print(f"\nPreparing training data for branch {branch_id}...")
     X, y = prepare_sequences(
         processed_data, 
@@ -105,8 +102,6 @@ def evaluate_model(
     y_val: np.ndarray,
     branch_id: str
 ) -> Dict:
-    """Evaluate model performance"""
-    
     print("\nEvaluating model...")
     
     y_pred = model.predict(X_val, verbose=0).flatten()
@@ -155,16 +150,13 @@ def save_model_artifacts(
     metrics: Dict,
     training_history: Dict
 ):
-    """Save model, preprocessor, and metadata"""
     branch_model_dir = MODEL_DIR / branch_id
     branch_model_dir.mkdir(parents=True, exist_ok=True)
     
     model_path = branch_model_dir / "model.h5"
     model.save(model_path)
-    print(f"\n✓ Model saved to: {model_path}")
     
     preprocessor_path = branch_model_dir / "preprocessor.pkl"
-    print(f"✓ Preprocessor at: {preprocessor_path}")
     
     metadata = {
         'branch_id': branch_id,
@@ -187,22 +179,10 @@ def save_model_artifacts(
     with open(metadata_path, 'wb') as f:
         pickle.dump(metadata, f)
     
-    print(f"✓ Metadata saved to: {metadata_path}")
-    
     return metadata
 
 
 async def train(branch_id: str) -> dict:
-    """
-    Main training function
-    
-    Args:
-        branch_id: Branch ID to train model for
-    
-    Returns:
-        dict with training results
-    """
-    
     try:
         for b in b_a:
             print(f"Training BranchId: {b}")
@@ -220,7 +200,6 @@ async def train(branch_id: str) -> dict:
                 f"Insufficient data: {len(training_data)} records (need at least 100)"
             )
         
-        print(f"✓ Fetched {len(training_data)} records")
         
         df = pd.DataFrame(training_data)
         
@@ -233,7 +212,6 @@ async def train(branch_id: str) -> dict:
             return preprocess_result
         
         processed_data = preprocess_result['data']
-        print(f"✓ Preprocessed shape: {processed_data.shape}")
         
         X_train, X_val, y_train, y_val = prepare_training_data(processed_data, branch_id)
         

@@ -14,14 +14,12 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/recommendation", tags=["Recommendations"])
 
 class CartRecommendationRequest(BaseModel):
-    """Request model for cart-based recommendations"""
     branch_id: str = Field(..., description="Branch ID")
     cart_items: List[str] = Field(..., description="List of item IDs in cart")
     n_recommendations: int = Field(default=5, ge=1, le=20, description="Number of recommendations")
 
 
 class PersonalizedRecommendationRequest(BaseModel):
-    """Request model for personalized recommendations"""
     branch_id: str = Field(..., description="Branch ID")
     user_name: str = Field(..., description="Username for personalization")
     n_recommendations: int = Field(default=5, ge=1, le=20, description="Number of recommendations")
@@ -29,7 +27,6 @@ class PersonalizedRecommendationRequest(BaseModel):
 
 
 class RecommendationResponse(BaseModel):
-    """Response model for recommendations"""
     success: bool
     message: str
     recommendations: List[dict]
@@ -39,8 +36,6 @@ class RecommendationResponse(BaseModel):
 @router.post("/cart-based")
 async def get_cart_recommendations(request: CartRecommendationRequest):
     try:
-        logger.info(f"Cart recommendations request for branch: {request.branch_id}")
-        
         if not request.cart_items:
             return JSONResponse(
                 status_code=200,

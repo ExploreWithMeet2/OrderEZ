@@ -17,17 +17,15 @@ from src.dp.preprocessing import (
     transform,
     calculate_price_change_percent,
     calculate_demand_metrics,
-    inverse_transform_price
 )
 from utils.returnFormat import returnFormat
 
 SEQUENCE_LENGTH = 30
-MAX_PRICE_CHANGE = 0.20  # ±20%
+MAX_PRICE_CHANGE = 0.20  
 MIN_CONFIDENCE = 0.6
 
 
 def categorize_demand(predicted_change: float) -> str:
-    """Categorize demand based on predicted price change"""
     if predicted_change > 10:
         return "HIGH"
     elif predicted_change < -5:
@@ -42,12 +40,8 @@ def generate_recommendation(
     confidence: float,
     demand_category: str
 ) -> Dict:
-    """Generate actionable recommendation"""
-    
     price_change = current_price * (predicted_change_percent / 100)
-    suggested_price = current_price + price_change
     
-    # Determine action
     if demand_category == "HIGH" and predicted_change_percent > 5:
         action = "INCREASE"
         reason = f"High demand detected. Market willing to pay {predicted_change_percent:.1f}% more."
@@ -89,11 +83,8 @@ def generate_recommendation(
 
 
 async def prepare_prediction_data(branch_id: str) -> pd.DataFrame:
-    """Prepare current data for prediction"""
-    
     print(f"\nPreparing prediction data for branch {branch_id}...")
     
-    # Fetch current items
     items_response = await fetch_branch_items(branch_id)
     if items_response["type"] == "error":
         raise ValueError(items_response["message"])
@@ -109,7 +100,6 @@ async def prepare_prediction_data(branch_id: str) -> pd.DataFrame:
     for item in items_list:
         item_id = item["_id"]
         
-        # Fetch recent price history (last 30 days for sequence)
         prices_response = await fetch_price_history(item_id, days=30)
         if prices_response["type"] == "error":
             continue
@@ -119,13 +109,11 @@ async def prepare_prediction_data(branch_id: str) -> pd.DataFrame:
             print(f"  Skipping {item['name']}: insufficient history ({len(prices_list)} records)")
             continue
         
-        # Fetch metrics
         metrics_response = await fetch_item_metrics(item_id, 7)
         metrics = (
             metrics_response["data"] if metrics_response["type"] == "success" else {}
         )
         
-        # Process price records
         for price_row in prices_list:
             timestamp = price_row["updatedAt"]
             dt = datetime.fromtimestamp(timestamp / 1000)
@@ -166,22 +154,11 @@ async def prepare_prediction_data(branch_id: str) -> pd.DataFrame:
 
 
 async def predict_prices(branch_id: str) -> dict:
-    """
-    Generate price predictions for all items in a branch
-    
-    Args:
-        branch_id: Branch ID
-    
-    Returns:
-        dict with predictions
-    """
-    
     try:
         print("\n" + "="*70)
         print(f"GENERATING PREDICTIONS FOR BRANCH: {branch_id}")
         print("="*70)
         
-        # Check if model exists
         model_path = Path("models") / branch_id / "model.h5"
         preprocessor_path = Path("models") / branch_id / "preprocessor.pkl"
         
@@ -191,28 +168,16 @@ async def predict_prices(branch_id: str) -> dict:
         if not preprocessor_path.exists():
             return returnFormat('error', f"No preprocessor found for branch {branch_id}.")
         
-        # Load model and preprocessor
-        print("\n[1/5] Loading model...")
         model = load_model(model_path)
-        print(f"✓ Model loaded from {model_path}")
         
-        print("\n[2/5] Loading preprocessor...")
         load_preprocessor(preprocessor_path)
-        print(f"✓ Preprocessor loaded")
-        
-        # Prepare data
-        print("\n[3/5] Preparing prediction data...")
         df = await prepare_prediction_data(branch_id)
         
-        # Preprocess
         df = calculate_price_change_percent(df)
         df = calculate_demand_metrics(df)
         transformed = transform(df)
         
-        print(f"✓ Data transformed: {transformed.shape}")
         
-        # Create sequences for each item
-        print("\n[4/5] Creating sequences and predicting...")
         predictions = []
         
         exclude_cols = [
@@ -227,34 +192,22 @@ async def predict_prices(branch_id: str) -> dict:
             if len(item_data) < SEQUENCE_LENGTH:
                 continue
             
-            # Get last sequence
             last_sequence = item_data[feature_cols].values[-SEQUENCE_LENGTH:]
             X = np.array([last_sequence])
             
-            # Predict
             predicted_change = model.predict(X, verbose=0)[0][0]
             
-            # Clip to reasonable bounds
             predicted_change = np.clip(predicted_change, -MAX_PRICE_CHANGE * 100, MAX_PRICE_CHANGE * 100)
             
-            # Calculate confidence (inverse of prediction uncertainty)
-            # For now, use a simple confidence based on how extreme the prediction is
             confidence = 1.0 - (abs(predicted_change) / 50.0)  # 50% is max expected
             confidence = np.clip(confidence, 0.5, 1.0)
             
-            # Get current price
             current_price = item_data.iloc[-1]['current_price']
             
-            # Inverse transform if needed (current_price might be scaled)
-            # For simplicity, assuming current_price is already in original scale
-            
-            # Categorize demand
             demand_category = categorize_demand(predicted_change)
             
-            # Calculate suggested price
             suggested_price = current_price * (1 + predicted_change / 100)
             
-            # Generate recommendation
             recommendation = generate_recommendation(
                 current_price,
                 predicted_change,
@@ -276,7 +229,6 @@ async def predict_prices(branch_id: str) -> dict:
             
             predictions.append(prediction)
             
-            # Create alert for LOW demand items
             if demand_category == "LOW":
                 await create_owner_alert(
                     branch_id=branch_id,
@@ -288,14 +240,10 @@ async def predict_prices(branch_id: str) -> dict:
                     confidence=float(confidence)
                 )
         
-        print(f"✓ Generated {len(predictions)} predictions")
-        
-        # Store predictions
-        print("\n[5/5] Storing predictions...")
         store_result = await store_predictions_batch(predictions)
         
         if store_result['type'] == 'error':
-            print(f"⚠️  Warning: Failed to store predictions: {store_result['message']}")
+            print(f"Warning: Failed to store predictions: {store_result['message']}")
         else:
             print(f"✓ Stored {store_result['data']['successful']} predictions")
         

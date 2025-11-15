@@ -1,8 +1,3 @@
-"""
-OrderEZ Recommendation Engine
-Provides cart-based and personalized menu recommendations
-"""
-
 from typing import List, Dict, Any, Optional, Tuple
 from collections import defaultdict, Counter
 from datetime import datetime, timedelta
@@ -124,7 +119,6 @@ class RecommendationEngine:
             for item in all_items:
                 item_id = item["_id"]
                 
-                # Skip unavailable items
                 if not item.get("isAvailable", True):
                     continue
                 
@@ -163,7 +157,6 @@ class RecommendationEngine:
                 if include_new and item_id not in user_item_freq:
                     score *= 1.1
                 
-                # Penalty for expensive items (unless user orders them)
                 avg_user_price = self._get_avg_user_price(user_orders)
                 item_price = item.get("currentPrice", item.get("basePrice", 0))
                 if item_price > avg_user_price * 1.5 and item_id not in user_item_freq:
@@ -193,7 +186,6 @@ class RecommendationEngine:
             return []
     
     def _calculate_item_similarity(self, all_orders: List[Dict]) -> Dict[Tuple[str, str], float]:
-        """Calculate item-to-item similarity using co-occurrence"""
         item_pairs = defaultdict(int)
         item_counts = defaultdict(int)
         
@@ -220,7 +212,6 @@ class RecommendationEngine:
         return similarities
     
     def _get_item_popularity(self, item_id: str, all_orders: List[Dict]) -> float:
-        """Calculate normalized popularity score for an item"""
         item_count = 0
         total_items = 0
         
@@ -233,7 +224,6 @@ class RecommendationEngine:
         return item_count / max(total_items, 1)
     
     def _get_trending_score(self, item_id: str, all_orders: List[Dict]) -> float:
-        """Calculate trending score based on recent orders"""
         try:
             current_time = datetime.now().timestamp() * 1000
             recent_cutoff = current_time - (7 * 24 * 60 * 60 * 1000)  
@@ -254,7 +244,6 @@ class RecommendationEngine:
             return 0.0
     
     def _get_avg_user_price(self, user_orders: List[Dict]) -> float:
-        """Calculate user's average order price"""
         if not user_orders:
             return 100.0  
         
@@ -274,7 +263,6 @@ class RecommendationEngine:
         user_item_freq: Dict[str, int],
         all_orders: List[Dict]
     ) -> str:
-        """Generate human-readable reason for recommendation"""
         if item_id not in user_item_freq:
             return "popular_choice"
         elif user_item_freq[item_id] >= 3:
@@ -288,7 +276,6 @@ class RecommendationEngine:
         all_items: List[Dict],
         n: int
     ) -> List[Dict[str, Any]]:
-        """Fallback: Return most popular items for new users"""
         try:
             item_popularity = defaultdict(int)
             

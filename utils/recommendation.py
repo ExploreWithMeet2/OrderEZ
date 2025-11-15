@@ -6,8 +6,6 @@ logger = logging.getLogger(__name__)
 
 
 class RecommendationCache:
-    """Simple in-memory cache for recommendations"""
-    
     def __init__(self, ttl_seconds: int = 300):  
         self.cache = {}
         self.ttl_seconds = ttl_seconds
@@ -23,11 +21,9 @@ class RecommendationCache:
         return None
     
     def set(self, key: str, value: Any):
-        """Set cached value with timestamp"""
         self.cache[key] = (value, datetime.now())
     
     def clear(self):
-        """Clear all cached values"""
         self.cache.clear()
 
 
@@ -46,7 +42,6 @@ def calculate_time_decay(timestamp: float, decay_rate: float = 0.1) -> float:
 
 
 def filter_available_items(items: List[Dict]) -> List[Dict]:
-    """Filter to only available items"""
     return [item for item in items if item.get("isAvailable", True)]
 
 
@@ -73,7 +68,6 @@ def calculate_diversity_score(recommendations: List[Dict], items: List[Dict]) ->
 
 
 def get_price_tier(price: float) -> str:
-    """Categorize item into price tier"""
     if price < 50:
         return "budget"
     elif price < 150:
@@ -85,7 +79,6 @@ def get_price_tier(price: float) -> str:
 
 
 def format_recommendation_reason(reason: str) -> str:
-    """Convert reason code to human-readable message"""
     reason_map = {
         "frequently_bought_together": "Frequently bought together with your cart items",
         "your_favorite": "One of your favorites",
@@ -130,7 +123,6 @@ def get_recommendation_explanation(
 ) -> str:
     try:
         reason = rec.get("reason", "")
-        score = rec.get("score", 0)
         item_id = rec.get("itemId")
         
         explanations = []

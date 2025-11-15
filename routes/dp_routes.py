@@ -29,15 +29,7 @@ class ApplyPriceRequest(BaseModel):
 
 @router.post("/train")
 async def train_model_route(request: TrainRequest):
-    """
-    Train dynamic pricing model for a branch
-    
-    Args:
-        branch_id: Branch ID to train model for
-    
-    Returns:
-        Training results with metrics
-    """
+
     try:
         result = await train(request.branch_id)
         
@@ -59,15 +51,6 @@ async def train_model_route(request: TrainRequest):
 
 @router.post("/predict")
 async def predict_prices_route(request: PredictRequest):
-    """
-    Generate price predictions for all items in a branch
-    
-    Args:
-        branch_id: Branch ID to predict prices for
-    
-    Returns:
-        Predictions for all items
-    """
     try:
         result = await predict_prices(request.branch_id)
         
@@ -89,7 +72,6 @@ async def predict_prices_route(request: PredictRequest):
 
 @router.get("/branches")
 async def get_branches():
-    """Get all branches with dynamic pricing enabled"""
     try:
         result = await get_all_branches()
         
@@ -113,16 +95,6 @@ async def get_predictions(
     branch_id: str,
     limit: int = Query(default=20, ge=1, le=100)
 ):
-    """
-    Get latest predictions for a branch
-    
-    Args:
-        branch_id: Branch ID
-        limit: Number of predictions to return
-    
-    Returns:
-        Latest predictions
-    """
     try:
         result = await get_latest_predictions(branch_id, limit)
         
@@ -143,15 +115,6 @@ async def get_predictions(
 
 @router.get("/model/{branch_id}")
 async def get_model_info(branch_id: str):
-    """
-    Get active model information for a branch
-    
-    Args:
-        branch_id: Branch ID
-    
-    Returns:
-        Active model metadata
-    """
     try:
         result = await get_active_model(branch_id)
         
@@ -183,17 +146,6 @@ async def get_model_info(branch_id: str):
 
 @router.post("/apply-price")
 async def apply_price_change(request: ApplyPriceRequest):
-    """
-    Apply predicted price to an item
-    
-    Args:
-        item_id: Item ID
-        new_price: New price to apply
-        prediction_id: Optional prediction ID
-    
-    Returns:
-        Success message
-    """
     try:
         result = await update_item_price(
             request.item_id,
@@ -218,7 +170,6 @@ async def apply_price_change(request: ApplyPriceRequest):
 
 @router.get("/health")
 async def health_check():
-    """Health check endpoint"""
     models_dir = Path("models")
     
     return JSONResponse(
