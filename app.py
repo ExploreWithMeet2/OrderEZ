@@ -20,8 +20,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(dp_routes.router)
-app.include_router(recommendation_routes.router)
+app.include_router(dp_routes)
+app.include_router(recommendation_routes)
 
 
 @app.get("/")
