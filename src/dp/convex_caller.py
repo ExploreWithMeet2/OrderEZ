@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 
-from schema.convex_schema import ConvexRequest
-from utils.convex import call_convex
-from utils.returnFormat import returnFormat
+from app.schema.convex_schema import ConvexRequest
+from app.utils.convex import call_convex
+from app.utils.returnFormat import returnFormat
 
 
 async def fetch_branch_items(branch_id: str) -> dict:
@@ -12,7 +12,7 @@ async def fetch_branch_items(branch_id: str) -> dict:
         func="getByBranch",
         isQuery=True,
         args={"branchId": branch_id},
-        returnDf=False,  
+        returnDf=False,
     )
     return await call_convex(req)
 
@@ -26,7 +26,7 @@ async def fetch_price_history(item_id: str, days: int = 30) -> dict:
         func="getHistoryByItem",
         isQuery=True,
         args={"itemId": item_id, "startTime": start_time, "endTime": end_time},
-        returnDf=False,  
+        returnDf=False,
     )
     return await call_convex(req)
 
@@ -54,7 +54,7 @@ async def fetch_orders_by_branch(branch_id: str, days: int = 30) -> dict:
         func="getByBranchTimeRange",
         isQuery=True,
         args={"branchId": branch_id, "startTime": start_time, "endTime": end_time},
-        returnDf=False,  
+        returnDf=False,
     )
     return await call_convex(req)
 
@@ -63,11 +63,11 @@ async def fetch_training_data(branch_id: str, days: int = 90) -> dict:
     items_response = await fetch_branch_items(branch_id)
     if items_response["type"] == "error":
         return items_response
-    
-    items_list = items_response["data"]  
+
+    items_list = items_response["data"]
     if not items_list:
         return returnFormat("error", f"No items found for branch {branch_id}")
-    
+
     print(f"Found {len(items_list)} items")
 
     all_data = []
@@ -79,7 +79,7 @@ async def fetch_training_data(branch_id: str, days: int = 90) -> dict:
         if prices_response["type"] == "error":
             continue
 
-        prices_list = prices_response["data"]  
+        prices_list = prices_response["data"]
         if not prices_list:
             continue
 
@@ -98,9 +98,9 @@ async def fetch_training_data(branch_id: str, days: int = 90) -> dict:
                 "current_price": price_row["value"],
                 "base_price": item.get("basePrice", price_row["value"]),
                 "timestamp": timestamp,
-                "dt": dt.isoformat(),  
+                "dt": dt.isoformat(),
                 "demand_7d": price_row.get("demand", "MEDIUM"),
-                "rating_7d": 4,  
+                "rating_7d": 4,
                 "orders_7d": metrics.get("totalOrders", 0),
                 "revenue_7d": metrics.get("totalRevenue", 0),
                 "avg_quantity": metrics.get("totalQuantity", 0)
@@ -127,7 +127,9 @@ async def fetch_training_data(branch_id: str, days: int = 90) -> dict:
             }
             all_data.append(record)
 
-    return returnFormat("success", f"Training data fetched: {len(all_data)} records", all_data)
+    return returnFormat(
+        "success", f"Training data fetched: {len(all_data)} records", all_data
+    )
 
 
 async def store_prediction(prediction: Dict) -> dict:

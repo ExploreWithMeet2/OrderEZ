@@ -11,11 +11,11 @@ import pandas as pd
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 
-from test import f
-from core.config import Config
-from src.dp.convex_caller.main import fetch_training_data, store_model_metadata
-from utils.returnFormat import returnFormat
-from src.dp.preprocessing import (
+from app.test import f
+from app.core.config import Config
+from app.src.dp.convex_caller import fetch_training_data, store_model_metadata
+from app.utils.returnFormat import returnFormat
+from app.src.dp.preprocessing import (
     dp_preprocessing,
     prepare_sequences,
 )
@@ -25,7 +25,7 @@ SEQUENCE_LENGTH = 30
 EPOCHS = 100
 BATCH_SIZE = 32
 TEST_SIZE = 0.2
-EARLY_STOP_PATIENCE = 15
+EARLY_STOP_PATIENCE = 20
 
 MAX_PRICE_CHANGE_PERCENT = 20.0
 MIN_PRICE_CHANGE_PERCENT = -20.0
