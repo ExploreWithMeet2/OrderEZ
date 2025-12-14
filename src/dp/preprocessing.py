@@ -12,11 +12,9 @@ label_encoders = {}
 scaler = MinMaxScaler()
 categorical_features = ["demand_7d", "time_of_day", "season"]
 numerical_features = [
+    "base_price",
     "current_price",
-    "rating_7d",
     "orders_7d",
-    "revenue_7d",
-    "avg_quantity",
 ]
 binary_features = ["is_weekend", "is_holiday", "is_event"]
 feature_stats = {}
