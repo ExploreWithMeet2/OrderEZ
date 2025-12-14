@@ -11,11 +11,11 @@ import pandas as pd
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 
-from app.test import f
-from app.core.config import Config
-from app.src.dp.convex_caller import fetch_training_data, store_model_metadata
-from app.utils.returnFormat import returnFormat
-from app.src.dp.preprocessing import (
+from test import f
+from core.config import Config
+from src.dp.convex_caller import fetch_training_data, store_model_metadata
+from utils.returnFormat import returnFormat
+from src.dp.preprocessing import (
     dp_preprocessing,
     prepare_sequences,
 )

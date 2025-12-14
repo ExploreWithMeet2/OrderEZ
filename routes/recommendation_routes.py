@@ -4,9 +4,9 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 import logging
 
-from app.schema.convex_schema import ConvexRequest
-from app.utils.convex import call_convex
-from app.src.recommendations.engine import RecommendationEngine
+from schema.convex_schema import ConvexRequest
+from utils.convex import call_convex
+from src.recommendations.engine import RecommendationEngine
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

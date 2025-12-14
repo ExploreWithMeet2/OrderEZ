@@ -5,20 +5,20 @@ import numpy as np
 import pandas as pd
 from keras.models import load_model
 
-from app.src.dp.convex_caller import (
+from src.dp.convex_caller import (
     fetch_branch_items,
     fetch_price_history,
     fetch_item_metrics,
     store_predictions_batch,
     create_owner_alert,
 )
-from app.src.dp.preprocessing import (
+from src.dp.preprocessing import (
     load_preprocessor,
     transform,
     calculate_price_change_percent,
     calculate_demand_metrics,
 )
-from app.utils.returnFormat import returnFormat
+from utils.returnFormat import returnFormat
 
 SEQUENCE_LENGTH = 30
 MAX_PRICE_CHANGE = 0.20

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from app.routes.dp_routes import train_model_route, predict_prices_route
-from app.routes.recommendation_routes import get_cart_recommendations
+from routes.dp_routes import train_model_route, predict_prices_route
+from routes.recommendation_routes import get_cart_recommendations
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger

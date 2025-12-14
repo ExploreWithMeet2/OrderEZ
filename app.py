@@ -3,8 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 # Import routers
-from app.routes.dp_routes import router as dp_routes
-from app.routes.recommendation_routes import router as recommendation_routes
+from routes.dp_routes import router as dp_routes
+from routes.recommendation_routes import router as recommendation_routes
 
 app = FastAPI(
     title="OrderEZ ML API",

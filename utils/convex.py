@@ -1,8 +1,8 @@
 import httpx
 import pandas as pd
 from utils.returnFormat import returnFormat
-from app.core.config import Config
-from app.schema.convex_schema import ConvexRequest
+from core.config import Config
+from schema.convex_schema import ConvexRequest
 import json
 
 CONVEX_URL = Config.convex_url

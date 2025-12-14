@@ -2,9 +2,9 @@ from pathlib import Path
 from fastapi import APIRouter, Query, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from app.src.dp.train import train
-from app.src.dp.predict import predict_prices
-from app.src.dp.convex_caller import (
+from src.dp.train import train
+from src.dp.predict import predict_prices
+from src.dp.convex_caller import (
     get_all_branches,
     get_latest_predictions,
     get_active_model,
